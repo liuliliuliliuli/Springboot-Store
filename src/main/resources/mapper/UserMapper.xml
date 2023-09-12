@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--namespace属性：用于指定当前映射文件和那个接口进行映射，需要指定接口的文件路径，需要标注包的完整路径结构-->
+<mapper namespace="com.example.springstore.mapper.UserMapper">
+
+    <!--自定义映射规则：resultMap标签来完成映射的规则自定义
+    id:给映射分配一个唯一的id值，对应的就是resultmap="id"的值
+    type:取值是一个类。表示数据库的查询结果和JAVA中那个实体类进行映射
+    -->
+    <resultMap id="UserEntityMap" type="com.example.springstore.entity.User">
+        <!--将表的字段和类字段不一致的匹配指定，一致的不写 column:表 property：类-->
+        <id column="uid" property="uid"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="modified_user" property="modifiedUser"/>
+        <result column="modified_time" property="modifiedTime"/>
+    </resultMap>
+
+    <!--id：表示映射的接口中方法的名称，直接再标签的内部来编写SQL语句-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="uid">
+        <!-- useGeneratedKeys开启一个字段的值自增（主键），keyProperty：将表中那个字段设为主键-->
+        insert into t_user(
+        username,password,salt,phone,email,gender,avatar,is_delete,created_user,
+        created_time,modified_user,modified_time
+        ) values (
+            #{username},#{password},#{salt},#{phone},#{email},#{gender},#{avatar},#{isDelete},#{createdUser},
+            #{createdTime},#{modifiedUser},#{modifiedTime}
+        )
+    </insert>
+
+    <!-- SELECT在执行时查询的是一个对象，多个对象-->
+    <!-- resultType:表示查询结果集的类型，只需要指定对象映射的类型，并且包含整个完整的接口
+        resultMap:表示表的字段和类的对象属性不一致时，来自定义查询结果级的映射规则
+    -->
+    <select id="findByUsername" resultMap="UserEntityMap">
+        Select * from t_user where username = #{username}
+    </select>
+
+    <update id="updatePasswordByUid">
+        update t_user set password=#{password},modified_user=#{modifiedUser},modified_time=#{modifiedTime}
+        where uid=#{uid}
+    </update>
+
+    <select id="findByUid" resultMap="UserEntityMap">
+        select * from t_user where uid=#{uid}
+    </select>
+
+</mapper>
